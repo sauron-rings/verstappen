@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MV1 — The Unstoppable Force</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #e10600;
+    --red-dark: #8b0000;
+    --red-glow: #ff1a00;
+    --gold: #c9a84c;
+    --gold-light: #f5d87e;
+    --bg: #050505;
+    --bg2: #0d0d0d;
+    --bg3: #111;
+    --surface: #161616;
+    --surface2: #1e1e1e;
+    --text: #e8e8e0;
+    --text-dim: #888;
+    --border: #2a2a2a;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:9999; opacity:0.35;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--red); border-radius:2px; }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 3rem;
+    height: 60px;
+    background: linear-gradient(180deg, rgba(5,5,5,0.98) 0%, rgba(5,5,5,0.6) 100%);
+    border-bottom: 1px solid rgba(225,6,0,0.3);
+    backdrop-filter: blur(10px);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2rem;
+    letter-spacing: 4px;
+    color: var(--red);
+    text-shadow: 0 0 20px rgba(225,6,0,0.6);
+  }
+  .nav-logo span { color: var(--gold); }
+  nav ul { display:flex; gap:2rem; list-style:none; }
+  nav a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration:none;
+    transition: color 0.2s, text-shadow 0.2s;
+  }
+  nav a:hover { color: var(--red); text-shadow: 0 0 10px rgba(225,6,0,0.5); }
+
+  /* ─── HERO ─── */
+  #hero {
+    position:relative;
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    overflow:hidden;
+    background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(139,0,0,0.18) 0%, transparent 70%),
+                linear-gradient(180deg, #050505 0%, #0a0505 100%);
+  }
+
+  /* Animated grid */
+  #hero::after {
+    content:'';
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(225,6,0,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(225,6,0,0.07) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridPulse 4s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes gridPulse {
+    0%,100% { opacity:0.4; }
+    50% { opacity:1; }
+  }
+
+  .hero-bg-text {
+    position:absolute;
+    font-family:'Bebas Neue',cursive;
+    font-size: clamp(100px, 22vw, 320px);
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(225,6,0,0.08);
+    pointer-events:none;
+    user-select:none;
+    letter-spacing:-10px;
+    top:50%; left:50%; transform:translate(-50%,-50%);
+    white-space:nowrap;
+    animation: bgTextFloat 8s ease-in-out infinite;
+  }
+  @keyframes bgTextFloat {
+    0%,100% { transform:translate(-50%,-50%) scale(1); }
+    50% { transform:translate(-50%,-52%) scale(1.02); }
+  }
+
+  .hero-number {
+    position:absolute;
+    top: 50px; right: 4vw;
+    font-family:'Bebas Neue',cursive;
+    font-size: clamp(180px, 25vw, 420px);
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(225,6,0,0.12);
+    pointer-events:none;
+    line-height:1;
+  }
+
+  .hero-content {
+    position:relative; z-index:2;
+    text-align:center;
+    padding: 2rem;
+  }
+  .hero-eyebrow {
+    font-family:'Space Mono',monospace;
+    font-size: 0.7rem;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    animation: fadeSlideUp 1s ease both;
+  }
+  .hero-title {
+    font-family:'Bebas Neue',cursive;
+    font-size: clamp(56px, 12vw, 160px);
+    line-height: 0.88;
+    letter-spacing: 6px;
+    color: var(--text);
+    animation: fadeSlideUp 1s ease 0.15s both;
+  }
+  .hero-title .accent { color: var(--red); text-shadow: 0 0 40px rgba(225,6,0,0.5); }
+  .hero-subtitle {
+    font-family:'Space Mono',monospace;
+    font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 1rem;
+    animation: fadeSlideUp 1s ease 0.3s both;
+  }
+
+  .hero-stats {
+    display:flex; gap:4rem; margin-top:4rem;
+    animation: fadeSlideUp 1s ease 0.45s both;
+  }
+  .hero-stat { text-align:center; }
+  .hero-stat .num {
+    font-family:'Bebas Neue',cursive;
+    font-size: 3.5rem;
+    color: var(--red);
+    text-shadow: 0 0 20px rgba(225,6,0,0.4);
+    display:block;
+    line-height:1;
+  }
+  .hero-stat .lbl {
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform:uppercase;
+  }
+
+  .hero-img-frame {
+    position:absolute;
+    bottom:0; left:50%; transform:translateX(-50%);
+    width: clamp(300px, 45vw, 580px);
+    pointer-events:none;
+    z-index:1;
+    animation: heroImgFloat 6s ease-in-out infinite;
+  }
+  @keyframes heroImgFloat {
+    0%,100% { transform:translateX(-50%) translateY(0); }
+    50% { transform:translateX(-50%) translateY(-16px); }
+  }
+  .hero-img-frame img {
+    width:100%; display:block;
+    filter: drop-shadow(0 -10px 60px rgba(225,6,0,0.3))
+            drop-shadow(0 0 120px rgba(225,6,0,0.15));
+  }
+  .hero-img-placeholder {
+    width:100%;
+    aspect-ratio: 3/4;
+    background: linear-gradient(180deg, transparent 0%, rgba(225,6,0,0.05) 50%, rgba(225,6,0,0.12) 100%);
+    border: 1px solid rgba(225,6,0,0.2);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:1rem;
+    color: rgba(225,6,0,0.4);
+    font-family:'Bebas Neue',cursive;
+    font-size:1.2rem; letter-spacing:3px;
+  }
+  .hero-img-placeholder::before {
+    content:'⬡';
+    font-size:3rem;
+    opacity:0.4;
+  }
+
+  .scroll-hint {
+    position:absolute; bottom:2rem; left:50%; transform:translateX(-50%);
+    z-index:3;
+    font-size:0.6rem; letter-spacing:4px; color:var(--text-dim); text-transform:uppercase;
+    display:flex; flex-direction:column; align-items:center; gap:0.5rem;
+    animation: fadeSlideUp 1s ease 0.8s both;
+  }
+  .scroll-hint::after {
+    content:'';
+    width:1px; height:40px;
+    background: linear-gradient(to bottom, var(--red), transparent);
+    animation: scrollLine 1.5s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0%,100% { opacity:0.3; height:20px; }
+    50% { opacity:1; height:40px; }
+  }
+
+  /* ─── SECTIONS ─── */
+  .section {
+    padding: 8rem 0;
+    position:relative;
+  }
+  .section-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 3rem;
+  }
+  .section-tag {
+    font-size:0.62rem; letter-spacing:6px; text-transform:uppercase;
+    color: var(--red); margin-bottom:0.5rem;
+    display:flex; align-items:center; gap:1rem;
+  }
+  .section-tag::after { content:''; flex:1; max-width:60px; height:1px; background:var(--red); opacity:0.5; }
+  .section-title {
+    font-family:'Bebas Neue',cursive;
+    font-size: clamp(40px, 7vw, 96px);
+    line-height:0.92;
+    letter-spacing:4px;
+    margin-bottom: 3rem;
+  }
+  .section-title .dim { color:var(--text-dim); }
+
+  /* ─── CHAPTER LINKS ─── */
+  #chapters {
+    background: var(--bg2);
+  }
+  .chapters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5px;
+    background: rgba(225,6,0,0.1);
+    border: 1px solid rgba(225,6,0,0.15);
+  }
+  .chapter-card {
+    background: var(--bg2);
+    padding: 2.5rem;
+    position:relative;
+    overflow:hidden;
+    cursor:pointer;
+    text-decoration:none;
+    color: var(--text);
+    display:block;
+    transition: background 0.3s;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .chapter-card::before {
+    content:'';
+    position:absolute; inset:0;
+    background: linear-gradient(135deg, rgba(225,6,0,0.06) 0%, transparent 60%);
+    opacity:0;
+    transition:opacity 0.3s;
+  }
+  .chapter-card:hover { background: var(--surface); }
+  .chapter-card:hover::before { opacity:1; }
+  .chapter-card:hover .chapter-arrow { transform:translate(4px,-4px); color:var(--red); }
+  .chapter-card:hover .chapter-num { color:var(--red); opacity:1; }
+
+  .chapter-num {
+    font-family:'Bebas Neue',cursive;
+    font-size:3.5rem;
+    color:var(--text-dim);
+    opacity:0.3;
+    line-height:1;
+    margin-bottom:0.5rem;
+    transition: color 0.3s, opacity 0.3s;
+  }
+  .chapter-name {
+    font-family:'Bebas Neue',cursive;
+    font-size:1.8rem;
+    letter-spacing:3px;
+    margin-bottom:0.75rem;
+  }
+  .chapter-desc {
+    font-size:0.72rem;
+    line-height:1.7;
+    color:var(--text-dim);
+  }
+  .chapter-arrow {
+    position:absolute; top:2rem; right:2rem;
+    font-size:1.5rem;
+    color:var(--text-dim);
+    transition: transform 0.3s, color 0.3s;
+  }
+  .chapter-tag {
+    display:inline-block;
+    font-size:0.55rem; letter-spacing:3px;
+    text-transform:uppercase;
+    padding: 3px 10px;
+    border: 1px solid rgba(225,6,0,0.4);
+    color: var(--red);
+    margin-top:1rem;
+  }
+
+  /* ─── PHOTO STRIP ─── */
+  #gallery {
+    overflow:hidden;
+    padding: 5rem 0;
+    background: var(--bg);
+  }
+  .gallery-track {
+    display:flex; gap:1.5rem;
+    animation: marquee 30s linear infinite;
+    width: max-content;
+  }
+  .gallery-track:hover { animation-play-state:paused; }
+  @keyframes marquee {
+    from { transform:translateX(0); }
+    to { transform:translateX(-50%); }
+  }
+  .gallery-item {
+    width: 260px; height: 320px; flex-shrink:0;
+    position:relative; overflow:hidden;
+    border: 1px solid var(--border);
+  }
+  .gallery-item img {
+    width:100%; height:100%; object-fit:cover;
+    filter: grayscale(30%) contrast(1.1);
+    transition: filter 0.4s, transform 0.6s;
+  }
+  .gallery-item:hover img { filter:grayscale(0%) contrast(1.2); transform:scale(1.05); }
+  .gallery-item .overlay {
+    position:absolute; bottom:0; left:0; right:0;
+    padding:1rem;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    font-size:0.6rem; letter-spacing:3px; text-transform:uppercase;
+    color:var(--gold);
+  }
+  .gallery-placeholder {
+    width:100%; height:100%;
+    background: var(--surface);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:0.5rem;
+    color:rgba(225,6,0,0.3); font-family:'Bebas Neue',cursive;
+    font-size:0.85rem; letter-spacing:2px; text-align:center; padding:1rem;
+  }
+
+  /* ─── RED LINE DIVIDER ─── */
+  .divider {
+    width:100%; height:1px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    opacity:0.4;
+  }
+
+  /* ─── QUOTE BLOCK ─── */
+  .quote-section {
+    padding:6rem 0;
+    background: linear-gradient(135deg, var(--bg) 0%, rgba(139,0,0,0.08) 50%, var(--bg) 100%);
+    position:relative;
+    overflow:hidden;
+  }
+  .quote-bg-num {
+    position:absolute; right:-2vw; top:50%; transform:translateY(-50%);
+    font-family:'Bebas Neue',cursive;
+    font-size:22vw; color:transparent;
+    -webkit-text-stroke:1px rgba(225,6,0,0.06);
+    pointer-events:none;
+  }
+  .quote-inner {
+    max-width:900px; margin:0 auto; padding:0 3rem; position:relative; z-index:1;
+  }
+  .quote-mark {
+    font-family:'Cinzel Decorative',serif;
+    font-size:6rem; line-height:0.5;
+    color:var(--red); opacity:0.4;
+    display:block; margin-bottom:1rem;
+  }
+  .quote-text {
+    font-family:'Bebas Neue',cursive;
+    font-size: clamp(24px, 4vw, 52px);
+    line-height:1.1;
+    letter-spacing:2px;
+    color:var(--text);
+    margin-bottom:2rem;
+  }
+  .quote-attr {
+    font-size:0.65rem; letter-spacing:4px; text-transform:uppercase;
+    color:var(--gold);
+  }
+
+  @keyframes fadeSlideUp {
+    from { opacity:0; transform:translateY(30px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--bg2);
+    border-top: 1px solid rgba(225,6,0,0.2);
+    padding: 3rem;
+    text-align:center;
+  }
+  .footer-logo {
+    font-family:'Bebas Neue',cursive;
+    font-size:3rem; letter-spacing:6px;
+    color:var(--red); margin-bottom:1rem;
+    text-shadow:0 0 30px rgba(225,6,0,0.3);
+  }
+  .footer-text { font-size:0.62rem; letter-spacing:3px; color:var(--text-dim); }
+  .footer-links { display:flex; gap:2rem; justify-content:center; margin-top:1.5rem; flex-wrap:wrap; }
+  .footer-links a { font-size:0.6rem; letter-spacing:3px; color:var(--text-dim); text-decoration:none; text-transform:uppercase; transition:color 0.2s; }
+  .footer-links a:hover { color:var(--red); }
+
+  /* ─── CURSOR TRAIL (JS) ─── */
+  .cursor-dot {
+    position:fixed;
+    width:6px; height:6px;
+    background:var(--red);
+    border-radius:50%;
+    pointer-events:none;
+    z-index:99999;
+    transition: transform 0.1s;
+    box-shadow:0 0 8px var(--red);
+  }
+
+  /* ─── REVEAL ANIMATION ─── */
+  .reveal {
+    opacity:0; transform:translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  /* ─── RESPONSIVE ─── */
+  @media(max-width:768px) {
+    nav ul { display:none; }
+    .hero-stats { gap:2rem; }
+    .hero-stat .num { font-size:2.5rem; }
+    .section-inner { padding:0 1.5rem; }
+    .chapters-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor-dot" id="cursorDot"></div>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="nav-logo">MV<span>1</span></div>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="records.html">Records</a></li>
+    <li><a href="career.html">Career</a></li>
+    <li><a href="racing-style.html">Style</a></li>
+    <li><a href="personal.html">Off Track</a></li>
+    <li><a href="timeline.html">Timeline</a></li>
+  </ul>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <div class="hero-bg-text">VERSTAPPEN</div>
+  <div class="hero-number">1</div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">Oracle Red Bull Racing · Born 30 Sept 1997</p>
+    <h1 class="hero-title">
+      MAX<br><span class="accent">VERSTAPPEN</span>
+    </h1>
+    <p class="hero-subtitle">Four-Time Formula One World Champion · The Apex Predator</p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="num">4</span>
+        <span class="lbl">World Titles</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">71</span>
+        <span class="lbl">Race Wins</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">48</span>
+        <span class="lbl">Pole Positions</span>
+      </div>
+      <div class="hero-stat">
+        <span class="num">127</span>
+        <span class="lbl">Podiums</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-img-frame">
+    <img src="images/hero-main.jpg" alt="Max Verstappen" onerror="this.parentElement.innerHTML='<div class=\'hero-img-placeholder\'>HERO · HELMET · hero-main.jpg</div>'">
+  </div>
+
+  <div class="scroll-hint">Scroll</div>
+</section>
+
+<!-- ─── CHAPTERS ─── -->
+<section id="chapters" class="section">
+  <div class="section-inner">
+    <div class="section-tag reveal">Explore the Legend</div>
+    <h2 class="section-title reveal">THE <span class="dim">CHAPTERS</span></h2>
+
+    <div class="chapters-grid reveal">
+
+      <a href="records.html" class="chapter-card">
+        <div class="chapter-num">01</div>
+        <div class="chapter-name">The Record Books</div>
+        <p class="chapter-desc">Youngest ever. 19 wins in a season. 10 in a row. A man who doesn't just break records — he obliterates them and writes new ones no one thought possible.</p>
+        <div class="chapter-tag">Records &amp; Stats</div>
+        <span class="chapter-arrow">↗</span>
+      </a>
+
+      <a href="career.html" class="chapter-card">
+        <div class="chapter-num">02</div>
+        <div class="chapter-name">The Rise</div>
+        <p class="chapter-desc">From a quad bike at age 2 to F1 at 17. A karting prodigy, a Toro Rosso debutant, a Red Bull lion — every chapter of a journey that was always destined for greatness.</p>
+        <div class="chapter-tag">Career Story</div>
+        <span class="chapter-arrow">↗</span>
+      </a>
+
+      <a href="racing-style.html" class="chapter-card">
+        <div class="chapter-num">03</div>
+        <div class="chapter-name">The Art of War</div>
+        <p class="chapter-desc">Relentless defending. Rain mastery. Superhuman car feel. Engineers say he creates a "flat area" in changes of direction no other driver can replicate. Pure savagery, scientific precision.</p>
+        <div class="chapter-tag">Driving Style</div>
+        <span class="chapter-arrow">↗</span>
+      </a>
+
+      <a href="personal.html" class="chapter-card">
+        <div class="chapter-num">04</div>
+        <div class="chapter-name">Beyond the Cockpit</div>
+        <p class="chapter-desc">World-class sim racer. Endurance racing at the Nordschleife. A man who, when not driving in F1, chooses to race everything else. Max Verstappen doesn't do rest.</p>
+        <div class="chapter-tag">Off Track</div>
+        <span class="chapter-arrow">↗</span>
+      </a>
+
+      <a href="timeline.html" class="chapter-card">
+        <div class="chapter-num">05</div>
+        <div class="chapter-name">The Timeline</div>
+        <p class="chapter-desc">Every milestone. Every championship. From 2013 karting world titles to becoming F1's record-setting supreme — the full story of MV1, year by year.</p>
+        <div class="chapter-tag">Full Timeline</div>
+        <span class="chapter-arrow">↗</span>
+      </a>
+
+      <a href="records.html#rivals" class="chapter-card">
+        <div class="chapter-num">06</div>
+        <div class="chapter-name">The Greatest Ever?</div>
+        <p class="chapter-desc">How does Max stack up against Senna, Schumacher, Hamilton? With 4 titles at 27, the ceiling isn't visible. The argument is already being written — and he's writing it in red.</p>
+        <div class="chapter-tag">Legacy</div>
+        <span class="chapter-arrow">↗</span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── GALLERY STRIP ─── -->
+<section id="gallery">
+  <div class="gallery-track" id="galleryTrack">
+    <!-- Items duplicated in JS for infinite scroll -->
+    <div class="gallery-item">
+      <img src="images/gallery-01.jpg" alt="Verstappen celebrating" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>VICTORY ROAR<br>gallery-01.jpg</div>'">
+      <div class="overlay">Bahrain 2022 · Win</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-02.jpg" alt="Verstappen helmet" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>HELMET CLOSE-UP<br>gallery-02.jpg</div>'">
+      <div class="overlay">The Iconic #33 / #1</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-03.jpg" alt="Verstappen in cockpit" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>IN THE COCKPIT<br>gallery-03.jpg</div>'">
+      <div class="overlay">The Office</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-04.jpg" alt="Verstappen Interlagos rain" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>INTERLAGOS RAIN<br>gallery-04.jpg</div>'">
+      <div class="overlay">Brazil 2016 · Legend Born</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-05.jpg" alt="Verstappen podium" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>PODIUM CHAMPION<br>gallery-05.jpg</div>'">
+      <div class="overlay">Abu Dhabi 2021 · First Title</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-06.jpg" alt="Verstappen with trophy" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>TROPHY LIFT<br>gallery-06.jpg</div>'">
+      <div class="overlay">Champion's Spoils</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-07.jpg" alt="Verstappen Monaco" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>MONACO STREETS<br>gallery-07.jpg</div>'">
+      <div class="overlay">Monaco · The Theatre</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-08.jpg" alt="Verstappen Spain 2016" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>SPAIN 2016 · DEBUT WIN<br>gallery-08.jpg</div>'">
+      <div class="overlay">Spain 2016 · The Moment</div>
+    </div>
+    <!-- Duplicates for seamless loop -->
+    <div class="gallery-item">
+      <img src="images/gallery-01.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>VICTORY ROAR<br>gallery-01.jpg</div>'">
+      <div class="overlay">Bahrain 2022 · Win</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-02.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>HELMET CLOSE-UP<br>gallery-02.jpg</div>'">
+      <div class="overlay">The Iconic #33 / #1</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-03.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>IN THE COCKPIT<br>gallery-03.jpg</div>'">
+      <div class="overlay">The Office</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-04.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>INTERLAGOS RAIN<br>gallery-04.jpg</div>'">
+      <div class="overlay">Brazil 2016 · Legend Born</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-05.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>PODIUM CHAMPION<br>gallery-05.jpg</div>'">
+      <div class="overlay">Abu Dhabi 2021 · First Title</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-06.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>TROPHY LIFT<br>gallery-06.jpg</div>'">
+      <div class="overlay">Champion's Spoils</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-07.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>MONACO STREETS<br>gallery-07.jpg</div>'">
+      <div class="overlay">Monaco · The Theatre</div>
+    </div>
+    <div class="gallery-item">
+      <img src="images/gallery-08.jpg" alt="" onerror="this.parentElement.innerHTML='<div class=\'gallery-placeholder\'>SPAIN 2016 · DEBUT WIN<br>gallery-08.jpg</div>'">
+      <div class="overlay">Spain 2016 · The Moment</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── QUOTE ─── -->
+<div class="quote-section">
+  <div class="quote-bg-num">1</div>
+  <div class="quote-inner">
+    <span class="quote-mark">"</span>
+    <p class="quote-text">If you no longer go for a gap that exists, you are no longer a racing driver.</p>
+    <p class="quote-attr">— Ayrton Senna · Words Max Lives By Every Lap</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-logo">MV1</div>
+  <p class="footer-text">MAX EMILIAN VERSTAPPEN · BORN 30 SEPTEMBER 1997 · HASSELT, BELGIUM</p>
+  <p class="footer-text" style="margin-top:0.5rem; opacity:0.5;">FOUR-TIME FORMULA ONE WORLD CHAMPION · 2021 · 2022 · 2023 · 2024</p>
+  <div class="footer-links">
+    <a href="records.html">Records</a>
+    <a href="career.html">Career</a>
+    <a href="racing-style.html">Driving Style</a>
+    <a href="personal.html">Off Track</a>
+    <a href="timeline.html">Timeline</a>
+  </div>
+  <p class="footer-text" style="margin-top:2rem; opacity:0.3;">Fan tribute page. Not affiliated with Max Verstappen or Oracle Red Bull Racing.</p>
+</footer>
+
+<script>
+// ─── CURSOR ───
+const dot = document.getElementById('cursorDot');
+document.addEventListener('mousemove', e => {
+  dot.style.left = e.clientX - 3 + 'px';
+  dot.style.top  = e.clientY - 3 + 'px';
+});
+
+// ─── REVEAL ON SCROLL ───
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver(entries => {
+  entries.forEach((entry, i) => {
+    if(entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 100);
+      io.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(el => io.observe(el));
+
+// ─── HERO STAT COUNTER ───
+document.querySelectorAll('.hero-stat .num').forEach(el => {
+  const target = +el.textContent;
+  let current = 0;
+  const step = Math.ceil(target / 60);
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current;
+    if(current >= target) clearInterval(timer);
+  }, 25);
+});
+</script>
+</body>
+</html>
