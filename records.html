@@ -1,0 +1,292 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MV1 — The Record Books</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#e10600;--red-dark:#8b0000;--gold:#c9a84c;--gold-light:#f5d87e;--bg:#050505;--bg2:#0d0d0d;--surface:#161616;--surface2:#1e1e1e;--text:#e8e8e0;--text-dim:#888;--border:#2a2a2a;}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.35;}
+  ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--red);}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 3rem;height:60px;background:rgba(5,5,5,0.95);border-bottom:1px solid rgba(225,6,0,0.3);backdrop-filter:blur(10px);}
+  .nav-logo{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:4px;color:var(--red);text-shadow:0 0 20px rgba(225,6,0,0.6);text-decoration:none;display:block;}
+  .nav-logo span{color:var(--gold);}
+  nav ul{display:flex;gap:2rem;list-style:none;}
+  nav a{font-size:0.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color 0.2s;}
+  nav a:hover,nav a.active{color:var(--red);}
+
+  /* PAGE HEADER */
+  .page-header{padding:120px 3rem 5rem;background:linear-gradient(180deg,rgba(139,0,0,0.12) 0%,transparent 100%);border-bottom:1px solid rgba(225,6,0,0.1);position:relative;overflow:hidden;}
+  .page-header::after{content:'RECORDS';position:absolute;right:-2vw;bottom:-3rem;font-family:'Bebas Neue',cursive;font-size:18vw;color:transparent;-webkit-text-stroke:1px rgba(225,6,0,0.05);pointer-events:none;}
+  .page-tag{font-size:0.62rem;letter-spacing:6px;text-transform:uppercase;color:var(--red);margin-bottom:0.5rem;}
+  .page-title{font-family:'Bebas Neue',cursive;font-size:clamp(48px,9vw,120px);line-height:0.9;letter-spacing:4px;}
+  .page-title span{color:var(--text-dim);}
+
+  /* CONTENT */
+  .content{max-width:1200px;margin:0 auto;padding:6rem 3rem;}
+
+  /* RECORD GRID */
+  .records-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:rgba(255,255,255,0.04);margin-bottom:6rem;}
+  .record-card{background:var(--bg2);padding:2rem;position:relative;overflow:hidden;transition:background 0.3s;}
+  .record-card:hover{background:var(--surface);}
+  .record-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--red);opacity:0;transition:opacity 0.3s;}
+  .record-card:hover::before{opacity:1;}
+  .record-value{font-family:'Bebas Neue',cursive;font-size:3.5rem;color:var(--red);text-shadow:0 0 20px rgba(225,6,0,0.3);line-height:1;margin-bottom:0.25rem;}
+  .record-label{font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--text);margin-bottom:0.5rem;}
+  .record-detail{font-size:0.65rem;color:var(--text-dim);line-height:1.6;}
+  .record-badge{display:inline-block;font-size:0.5rem;letter-spacing:3px;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(201,168,76,0.4);color:var(--gold);margin-top:0.75rem;}
+
+  /* FACT LIST */
+  .facts-section{margin-bottom:5rem;}
+  .section-heading{font-family:'Bebas Neue',cursive;font-size:clamp(28px,5vw,60px);letter-spacing:4px;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid rgba(225,6,0,0.2);}
+  .section-heading span{color:var(--red);}
+  .fact-list{display:flex;flex-direction:column;gap:1px;}
+  .fact-item{display:grid;grid-template-columns:80px 1fr auto;gap:2rem;align-items:start;padding:1.5rem;background:var(--bg2);transition:background 0.2s;border-left:2px solid transparent;cursor:default;}
+  .fact-item:hover{background:var(--surface);border-left-color:var(--red);}
+  .fact-num{font-family:'Bebas Neue',cursive;font-size:1.5rem;color:rgba(225,6,0,0.4);}
+  .fact-text{font-size:0.78rem;line-height:1.75;color:var(--text);}
+  .fact-text strong{color:var(--gold);}
+  .fact-year{font-size:0.6rem;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;white-space:nowrap;padding-top:0.2rem;}
+
+  /* SEASON TABLE */
+  .season-table{width:100%;border-collapse:collapse;margin-bottom:5rem;}
+  .season-table th{font-size:0.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--red);padding:0.75rem 1rem;text-align:left;border-bottom:1px solid rgba(225,6,0,0.3);}
+  .season-table td{font-size:0.75rem;padding:1rem;border-bottom:1px solid var(--border);color:var(--text);}
+  .season-table tr:hover td{background:var(--surface);}
+  .season-table .champion{color:var(--gold);font-weight:700;}
+  .season-table .wins{color:var(--red);font-family:'Bebas Neue',cursive;font-size:1.1rem;}
+
+  /* PHOTO */
+  .photo-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:4rem 0;background:rgba(255,255,255,0.04);}
+  .photo-box{aspect-ratio:3/4;overflow:hidden;position:relative;}
+  .photo-box img{width:100%;height:100%;object-fit:cover;filter:grayscale(20%) contrast(1.1);transition:filter 0.4s,transform 0.5s;}
+  .photo-box:hover img{filter:grayscale(0%) contrast(1.2);transform:scale(1.04);}
+  .photo-box .cap{position:absolute;bottom:0;left:0;right:0;padding:1rem;background:linear-gradient(transparent,rgba(0,0,0,0.9));font-size:0.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);}
+  .photo-placeholder{width:100%;height:100%;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.5rem;color:rgba(225,6,0,0.3);font-family:'Bebas Neue',cursive;font-size:0.8rem;letter-spacing:2px;text-align:center;padding:1rem;}
+
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  footer{background:var(--bg2);border-top:1px solid rgba(225,6,0,0.2);padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;}
+  .footer-logo-sm{font-family:'Bebas Neue',cursive;font-size:1.8rem;letter-spacing:4px;color:var(--red);}
+  .footer-logo-sm span{color:var(--gold);}
+  .footer-nav{display:flex;gap:2rem;}
+  .footer-nav a{font-size:0.6rem;letter-spacing:3px;color:var(--text-dim);text-decoration:none;text-transform:uppercase;transition:color 0.2s;}
+  .footer-nav a:hover{color:var(--red);}
+  @media(max-width:768px){nav ul{display:none;}.fact-item{grid-template-columns:1fr;}.photo-row{grid-template-columns:1fr;}.footer-nav{display:none;}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">MV<span>1</span></a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="records.html" class="active">Records</a></li>
+    <li><a href="career.html">Career</a></li>
+    <li><a href="racing-style.html">Style</a></li>
+    <li><a href="personal.html">Off Track</a></li>
+    <li><a href="timeline.html">Timeline</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <p class="page-tag">Chapter 01 — The Record Books</p>
+  <h1 class="page-title">THE NUMBERS<br><span>ARE ABSURD</span></h1>
+</div>
+
+<div class="content">
+
+  <!-- KEY RECORDS -->
+  <div class="records-grid reveal">
+    <div class="record-card">
+      <div class="record-value">71</div>
+      <div class="record-label">Grand Prix Victories</div>
+      <div class="record-detail">As of May 2026. Climbs every season, already among the all-time elite.</div>
+      <div class="record-badge">Active Record</div>
+    </div>
+    <div class="record-card">
+      <div class="record-value">19</div>
+      <div class="record-label">Most Wins in a Season</div>
+      <div class="record-detail">2023 — Won 19 of 22 races. His own previous record of 15 (2022) didn't last a year.</div>
+      <div class="record-badge">All-Time Record</div>
+    </div>
+    <div class="record-card">
+      <div class="record-value">10</div>
+      <div class="record-label">Consecutive Race Wins</div>
+      <div class="record-detail">Miami → Monza 2023. Ten in a row — a new F1 record no one thought possible.</div>
+      <div class="record-badge">All-Time Record</div>
+    </div>
+    <div class="record-card">
+      <div class="record-value">575</div>
+      <div class="record-label">Points in a Season</div>
+      <div class="record-detail">2023. Smashed Lewis Hamilton's previous record. An astronomical single-season haul.</div>
+      <div class="record-badge">All-Time Record</div>
+    </div>
+    <div class="record-card">
+      <div class="record-value">21</div>
+      <div class="record-label">Podiums in a Season</div>
+      <div class="record-detail">2023. Finished off the podium just once all year. Singapore was his only blemish.</div>
+      <div class="record-badge">All-Time Record</div>
+    </div>
+    <div class="record-card">
+      <div class="record-value">8</div>
+      <div class="record-label">Consecutive Pole Positions</div>
+      <div class="record-detail">Equalling Ayrton Senna's legendary record — sharing it with an icon.</div>
+      <div class="record-badge">Joint Record</div>
+    </div>
+    <div class="record-card">
+      <div class="record-value">17</div>
+      <div class="record-label">Youngest F1 Race Starter</div>
+      <div class="record-detail">17 years, 166 days at the 2015 Australian GP — broke Jaime Alguersuari by nearly 2 years.</div>
+      <div class="record-badge">All-Time Record</div>
+    </div>
+    <div class="record-card">
+      <div class="record-value">4</div>
+      <div class="record-label">Consecutive WDC Titles</div>
+      <div class="record-detail">2021–2024. Only the 5th driver ever to win four or more championships.</div>
+      <div class="record-badge">Historic</div>
+    </div>
+    <div class="record-card">
+      <div class="record-value">1007</div>
+      <div class="record-label">Days at Top of Standings</div>
+      <div class="record-detail">Broke Schumacher's record of 896 consecutive days leading the championship. 2 years, 9 months.</div>
+      <div class="record-badge">All-Time Record</div>
+    </div>
+    <div class="record-card">
+      <div class="record-value">75%</div>
+      <div class="record-label">Pole-to-Win Conversion</div>
+      <div class="record-detail">The best pole-to-win conversion rate of any driver who has taken pole at least 5 times.</div>
+      <div class="record-badge">All-Time Record</div>
+    </div>
+    <div class="record-card">
+      <div class="record-value">10</div>
+      <div class="record-label">Different Grid Positions Won From</div>
+      <div class="record-detail">Including a stunning 2024 São Paulo win from P17 — more grid-position diversity in wins than anyone.</div>
+      <div class="record-badge">All-Time Record</div>
+    </div>
+    <div class="record-card">
+      <div class="record-value">1:18.792</div>
+      <div class="record-label">Fastest Lap in F1 History</div>
+      <div class="record-detail">Set at Monza, 2025 Italian Grand Prix. Beat Hamilton's 2020 benchmark by 0.095 seconds.</div>
+      <div class="record-badge">All-Time Record</div>
+    </div>
+  </div>
+
+  <!-- SEASON BY SEASON -->
+  <div class="facts-section reveal">
+    <h2 class="section-heading">Season <span>By Season</span></h2>
+    <table class="season-table">
+      <thead>
+        <tr>
+          <th>Season</th>
+          <th>Team</th>
+          <th>Wins</th>
+          <th>Poles</th>
+          <th>Podiums</th>
+          <th>Points</th>
+          <th>Position</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>2015</td><td>Toro Rosso</td><td class="wins">0</td><td>0</td><td>0</td><td>49</td><td>12th</td></tr>
+        <tr><td>2016</td><td>Toro Rosso / Red Bull</td><td class="wins">1</td><td>0</td><td>7</td><td>204</td><td>5th</td></tr>
+        <tr><td>2017</td><td>Red Bull</td><td class="wins">2</td><td>2</td><td>8</td><td>168</td><td>6th</td></tr>
+        <tr><td>2018</td><td>Red Bull</td><td class="wins">2</td><td>2</td><td>11</td><td>249</td><td>4th</td></tr>
+        <tr><td>2019</td><td>Red Bull</td><td class="wins">3</td><td>2</td><td>9</td><td>278</td><td>3rd</td></tr>
+        <tr><td>2020</td><td>Red Bull</td><td class="wins">2</td><td>1</td><td>11</td><td>214</td><td>3rd</td></tr>
+        <tr><td class="champion">2021 ★</td><td>Red Bull</td><td class="wins">10</td><td>10</td><td>18</td><td>395.5</td><td class="champion">CHAMPION</td></tr>
+        <tr><td class="champion">2022 ★</td><td>Red Bull</td><td class="wins">15</td><td>15</td><td>17</td><td>454</td><td class="champion">CHAMPION</td></tr>
+        <tr><td class="champion">2023 ★</td><td>Red Bull</td><td class="wins">19</td><td>12</td><td>21</td><td>575</td><td class="champion">CHAMPION</td></tr>
+        <tr><td class="champion">2024 ★</td><td>Red Bull</td><td class="wins">9</td><td>9</td><td>14</td><td>437</td><td class="champion">CHAMPION</td></tr>
+        <tr><td>2025</td><td>Red Bull</td><td class="wins">6</td><td>–</td><td>–</td><td>–</td><td>2nd (−2 pts)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PHOTO ROW -->
+  <div class="photo-row reveal">
+    <div class="photo-box">
+      <img src="images/records-01.jpg" alt="Verstappen trophy wall" onerror="this.parentElement.innerHTML='<div class=\'photo-placeholder\'>TROPHY ROOM<br>records-01.jpg</div>'">
+      <div class="cap">The Trophy Wall</div>
+    </div>
+    <div class="photo-box">
+      <img src="images/records-02.jpg" alt="Verstappen 2023 Japan title" onerror="this.parentElement.innerHTML='<div class=\'photo-placeholder\'>JAPAN 2023 TITLE<br>records-02.jpg</div>'">
+      <div class="cap">Japan 2023 · Third Crown</div>
+    </div>
+    <div class="photo-box">
+      <img src="images/records-03.jpg" alt="Verstappen São Paulo 2024" onerror="this.parentElement.innerHTML='<div class=\'photo-placeholder\'>SAO PAULO 2024<br>records-03.jpg</div>'">
+      <div class="cap">São Paulo 2024 · P17 → P1</div>
+    </div>
+  </div>
+
+  <!-- WILD FACTS -->
+  <div class="facts-section reveal" id="rivals">
+    <h2 class="section-heading">Facts That <span>Break Brains</span></h2>
+    <div class="fact-list">
+      <div class="fact-item">
+        <div class="fact-num">01</div>
+        <div class="fact-text">In 2023, Verstappen won <strong>19 of 22 races</strong>. For context, an entire season once had fewer than 19 races total.</div>
+        <div class="fact-year">2023</div>
+      </div>
+      <div class="fact-item">
+        <div class="fact-num">02</div>
+        <div class="fact-text">He won his <strong>first Grand Prix aged 18</strong> — at the Spanish GP 2016 on debut with Red Bull. No one had ever done that. No one has since.</div>
+        <div class="fact-year">2016</div>
+      </div>
+      <div class="fact-item">
+        <div class="fact-num">03</div>
+        <div class="fact-text">In 2024, Verstappen won from <strong>P17 on the grid</strong> in São Paulo in the rain. Engineers called it one of the greatest drives in modern F1 history.</div>
+        <div class="fact-year">2024</div>
+      </div>
+      <div class="fact-item">
+        <div class="fact-num">04</div>
+        <div class="fact-text">His 2023 <strong>575-point season</strong> is so dominant that his teammate Pérez scored just 285 — barely half. The car was the same.</div>
+        <div class="fact-year">2023</div>
+      </div>
+      <div class="fact-item">
+        <div class="fact-num">05</div>
+        <div class="fact-text">He broke <strong>Alberto Ascari's 75-year-old win percentage record</strong>. Ascari's seemed untouchable — Max didn't even need a full season to bury it.</div>
+        <div class="fact-year">2024</div>
+      </div>
+      <div class="fact-item">
+        <div class="fact-num">06</div>
+        <div class="fact-text">Max has won from <strong>10 different starting grid positions</strong> — from pole all the way to P17. No other driver has won from more diverse positions.</div>
+        <div class="fact-year">All-Time</div>
+      </div>
+      <div class="fact-item">
+        <div class="fact-num">07</div>
+        <div class="fact-text">In 2025, even with McLaren being dramatically faster all year, Max came within <strong>2 points</strong> of a fifth consecutive championship on the final lap of the final race.</div>
+        <div class="fact-year">2025</div>
+      </div>
+      <div class="fact-item">
+        <div class="fact-num">08</div>
+        <div class="fact-text">Verstappen holds the <strong>fastest lap in F1 history</strong> — 1:18.792 at Monza in 2025 — beating a benchmark set by Lewis Hamilton that had stood for 5 years.</div>
+        <div class="fact-year">2025</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo-sm">MV<span>1</span></div>
+  <div class="footer-nav">
+    <a href="index.html">Home</a>
+    <a href="career.html">Career</a>
+    <a href="racing-style.html">Style</a>
+    <a href="personal.html">Off Track</a>
+    <a href="timeline.html">Timeline</a>
+  </div>
+</footer>
+
+<script>
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
