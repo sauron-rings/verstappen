@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MV1 — Beyond the Cockpit</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#e10600;--gold:#c9a84c;--bg:#050505;--bg2:#0d0d0d;--surface:#161616;--text:#e8e8e0;--text-dim:#888;--border:#2a2a2a;}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.35;}
+  ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--red);}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 3rem;height:60px;background:rgba(5,5,5,0.95);border-bottom:1px solid rgba(225,6,0,0.3);backdrop-filter:blur(10px);}
+  .nav-logo{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:4px;color:var(--red);text-decoration:none;}
+  .nav-logo span{color:var(--gold);}
+  nav ul{display:flex;gap:2rem;list-style:none;}
+  nav a{font-size:0.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color 0.2s;}
+  nav a:hover,nav a.active{color:var(--red);}
+
+  .page-header{padding:120px 3rem 5rem;background:linear-gradient(180deg,rgba(139,0,0,0.1) 0%,transparent 100%);border-bottom:1px solid rgba(225,6,0,0.1);position:relative;overflow:hidden;}
+  .page-header::after{content:'MAX';position:absolute;right:-2vw;bottom:-3rem;font-family:'Bebas Neue',cursive;font-size:26vw;color:transparent;-webkit-text-stroke:1px rgba(225,6,0,0.04);pointer-events:none;}
+  .page-tag{font-size:0.62rem;letter-spacing:6px;text-transform:uppercase;color:var(--red);margin-bottom:0.5rem;}
+  .page-title{font-family:'Bebas Neue',cursive;font-size:clamp(48px,9vw,120px);line-height:0.9;letter-spacing:4px;}
+  .page-title span{color:var(--text-dim);}
+
+  .content{max-width:1200px;margin:0 auto;padding:6rem 3rem;}
+
+  .section-heading{font-family:'Bebas Neue',cursive;font-size:clamp(28px,5vw,60px);letter-spacing:4px;margin-bottom:2.5rem;padding-bottom:1rem;border-bottom:1px solid rgba(225,6,0,0.2);}
+  .section-heading span{color:var(--red);}
+
+  /* PERSONAL INTRO */
+  .personal-intro{display:grid;grid-template-columns:1fr 1fr;gap:4rem;margin-bottom:6rem;align-items:center;}
+  .personal-intro .text p{font-size:0.78rem;line-height:1.9;color:var(--text-dim);margin-bottom:1.2rem;}
+  .personal-intro .text p strong{color:var(--text);}
+  .personal-intro .text h2{font-family:'Bebas Neue',cursive;font-size:clamp(32px,5vw,56px);letter-spacing:3px;margin-bottom:1.5rem;}
+  .personal-intro .text h2 span{color:var(--red);}
+  .personal-img{aspect-ratio:3/4;overflow:hidden;border:1px solid rgba(225,6,0,0.2);}
+  .personal-img img{width:100%;height:100%;object-fit:cover;filter:grayscale(15%) contrast(1.1);transition:filter 0.5s;}
+  .personal-img:hover img{filter:grayscale(0%);}
+  .img-ph{width:100%;height:100%;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.5rem;color:rgba(225,6,0,0.3);font-family:'Bebas Neue',cursive;font-size:0.85rem;letter-spacing:2px;text-align:center;padding:1rem;}
+
+  /* SIM RACING */
+  .sim-block{background:var(--bg2);padding:3rem;border:1px solid rgba(225,6,0,0.1);margin-bottom:4rem;position:relative;overflow:hidden;}
+  .sim-block::before{content:'SIM';position:absolute;right:-1rem;bottom:-2rem;font-family:'Bebas Neue',cursive;font-size:12rem;color:rgba(225,6,0,0.04);pointer-events:none;}
+  .sim-block h3{font-family:'Bebas Neue',cursive;font-size:2.5rem;letter-spacing:3px;color:var(--gold);margin-bottom:1rem;}
+  .sim-block p{font-size:0.76rem;line-height:1.85;color:var(--text-dim);}
+  .sim-block p strong{color:var(--text);}
+  .sim-block .sim-stats{display:flex;gap:3rem;margin-top:2rem;}
+  .sim-stat-num{font-family:'Bebas Neue',cursive;font-size:2.5rem;color:var(--red);display:block;line-height:1;}
+  .sim-stat-lbl{font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);}
+
+  /* QUICK FACTS */
+  .quick-facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5px;background:rgba(255,255,255,0.04);margin-bottom:6rem;}
+  .qf-card{background:var(--bg2);padding:2rem;transition:background 0.3s;}
+  .qf-card:hover{background:var(--surface);}
+  .qf-label{font-size:0.58rem;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:0.5rem;}
+  .qf-value{font-family:'Bebas Neue',cursive;font-size:1.6rem;letter-spacing:2px;margin-bottom:0.5rem;}
+  .qf-detail{font-size:0.68rem;color:var(--text-dim);line-height:1.6;}
+
+  /* RACING TEAM */
+  .team-block{display:grid;grid-template-columns:1fr 1fr;gap:4rem;margin-bottom:6rem;align-items:start;}
+  .team-block .img{aspect-ratio:16/9;overflow:hidden;border:1px solid rgba(225,6,0,0.15);}
+  .team-block .img img{width:100%;height:100%;object-fit:cover;filter:grayscale(20%) contrast(1.1);transition:filter 0.4s;}
+  .team-block .img:hover img{filter:grayscale(0%);}
+  .ph16-9{width:100%;height:100%;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.5rem;color:rgba(225,6,0,0.3);font-family:'Bebas Neue',cursive;font-size:0.85rem;letter-spacing:2px;text-align:center;padding:1rem;}
+  .team-block .text h3{font-family:'Bebas Neue',cursive;font-size:2.5rem;letter-spacing:3px;margin-bottom:1rem;}
+  .team-block .text p{font-size:0.75rem;line-height:1.85;color:var(--text-dim);}
+  .team-block .text p strong{color:var(--text);}
+
+  /* NORDSCHLEIFE */
+  .nordschleife{background:linear-gradient(135deg,var(--bg2) 0%,rgba(139,0,0,0.08) 100%);padding:3.5rem;border:1px solid rgba(225,6,0,0.12);margin-bottom:4rem;}
+  .nordschleife h3{font-family:'Bebas Neue',cursive;font-size:2.2rem;letter-spacing:3px;margin-bottom:1rem;color:var(--gold);}
+  .nordschleife p{font-size:0.75rem;line-height:1.85;color:var(--text-dim);}
+  .nordschleife p strong{color:var(--text);}
+
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  footer{background:var(--bg2);border-top:1px solid rgba(225,6,0,0.2);padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;}
+  .footer-logo-sm{font-family:'Bebas Neue',cursive;font-size:1.8rem;letter-spacing:4px;color:var(--red);}
+  .footer-logo-sm span{color:var(--gold);}
+  .footer-nav{display:flex;gap:2rem;}
+  .footer-nav a{font-size:0.6rem;letter-spacing:3px;color:var(--text-dim);text-decoration:none;text-transform:uppercase;transition:color 0.2s;}
+  .footer-nav a:hover{color:var(--red);}
+  @media(max-width:768px){nav ul{display:none;}.personal-intro,.team-block{grid-template-columns:1fr;}.sim-block .sim-stats{flex-wrap:wrap;gap:1.5rem;}.footer-nav{display:none;}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">MV<span>1</span></a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="records.html">Records</a></li>
+    <li><a href="career.html">Career</a></li>
+    <li><a href="racing-style.html">Style</a></li>
+    <li><a href="personal.html" class="active">Off Track</a></li>
+    <li><a href="timeline.html">Timeline</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <p class="page-tag">Chapter 04 — Beyond the Cockpit</p>
+  <h1 class="page-title">MAX<br><span>NEVER STOPS</span></h1>
+</div>
+
+<div class="content">
+
+  <!-- PERSONAL INTRO -->
+  <div class="personal-intro reveal">
+    <div class="text">
+      <h2>The Man <span>Behind the Helmet</span></h2>
+      <p>Max Emilian Verstappen was born on <strong>30 September 1997</strong> in Hasselt, Belgium. He grew up in Maaseik with his father Jos — who himself raced 106 Grands Prix in Formula One. Max lives in <strong>Monaco</strong>, which he famously describes as being close to multiple race circuits and having excellent weather for go-karting.</p>
+      <p>Off the track, the one thing that surprises people most: <strong>Max Verstappen doesn't switch off</strong>. He doesn't take holidays from racing. He races online. He races endurance cars. He races GT4 on the Nordschleife. In the rare moment he's not physically in a car, he's studying data, watching races, or optimising his sim setup at home.</p>
+      <p>He has a longtime partner <strong>Kelly Piquet</strong> — daughter of three-time F1 champion Nelson Piquet — and a daughter named <strong>Penelope</strong>, born in May 2024. He loves cooking, especially Brazilian food, and has a deep, genuine passion for sim racing that goes far beyond hobby level.</p>
+    </div>
+    <div class="personal-img">
+      <img src="images/personal-casual.jpg" alt="Max Verstappen off duty" onerror="this.parentElement.innerHTML='<div class=\'img-ph\'>MAX OFF DUTY<br>personal-casual.jpg</div>'">
+    </div>
+  </div>
+
+  <!-- SIM RACING -->
+  <div class="sim-block reveal">
+    <h3>The Sim Racing World Champion (Unofficially)</h3>
+    <p>Max Verstappen has been sim racing competitively since <strong>2015</strong>. He doesn't do it casually — he does it seriously, winning marquee iRacing events that professional sim racers train months for. In 2024, he won the <strong>Daytona 24 Special Event in the GTD class</strong>, then won the <strong>Nürburgring 24 Special Event on the same weekend</strong> as the Emilia Romagna Grand Prix. He also won the <strong>Spa 24 Special Event</strong> that year — completing a perfect trifecta of 24-hour sim events in a single season.</p>
+    <p style="margin-top:1rem;">Autosport's Ed Hardy wrote that Verstappen had <strong>"firmly established himself as one of the best sim racers in the world"</strong> — not one of the best F1 drivers who also sim races, but one of the best sim racers, full stop. He also founded the <strong>Verstappen Racing team</strong> in 2022, which competes in sim racing, GT racing, and rally events.</p>
+    <div class="sim-stats">
+      <div><span class="sim-stat-num">2015</span><span class="sim-stat-lbl">Racing Online Since</span></div>
+      <div><span class="sim-stat-num">3</span><span class="sim-stat-lbl">24H Events Won in 2024</span></div>
+      <div><span class="sim-stat-num">VR</span><span class="sim-stat-lbl">Verstappen Racing Team</span></div>
+    </div>
+  </div>
+
+  <!-- QUICK FACTS -->
+  <div class="quick-facts reveal">
+    <div class="qf-card">
+      <div class="qf-label">Date of Birth</div>
+      <div class="qf-value">30 Sept 1997</div>
+      <div class="qf-detail">Born in Hasselt, Belgium. Dutch nationality. Races under the Dutch flag.</div>
+    </div>
+    <div class="qf-card">
+      <div class="qf-label">Home</div>
+      <div class="qf-value">Monaco</div>
+      <div class="qf-detail">Has lived in Monaco for years. Close to circuits and, he jokes, ideal for karting weather.</div>
+    </div>
+    <div class="qf-card">
+      <div class="qf-label">Partner</div>
+      <div class="qf-value">Kelly Piquet</div>
+      <div class="qf-detail">Daughter of three-time F1 World Champion Nelson Piquet. A genuine motor racing dynasty union.</div>
+    </div>
+    <div class="qf-card">
+      <div class="qf-label">Daughter</div>
+      <div class="qf-value">Penelope</div>
+      <div class="qf-detail">Born May 2024. Max said becoming a father was the most meaningful thing to happen to him.</div>
+    </div>
+    <div class="qf-card">
+      <div class="qf-label">Father</div>
+      <div class="qf-value">Jos Verstappen</div>
+      <div class="qf-detail">Dutch F1 driver, 106 Grand Prix starts. Max grew up watching and feeling F1 from birth.</div>
+    </div>
+    <div class="qf-card">
+      <div class="qf-label">Car Number</div>
+      <div class="qf-value">#33 / #1</div>
+      <div class="qf-detail">Used 33 early career. Switched to #1 as champion. Returns to #3 in 2026 per FIA regulations.</div>
+    </div>
+    <div class="qf-card">
+      <div class="qf-label">Race Engineer</div>
+      <div class="qf-value">Gianpiero Lambiase</div>
+      <div class="qf-detail">"GP" — the man on the radio through every championship. One of sport's iconic driver-engineer partnerships.</div>
+    </div>
+    <div class="qf-card">
+      <div class="qf-label">Hobby</div>
+      <div class="qf-value">Sim Racing</div>
+      <div class="qf-detail">Not a casual interest. He trains, competes, wins titles, and owns a professional sim racing team.</div>
+    </div>
+    <div class="qf-card">
+      <div class="qf-label">Time Magazine</div>
+      <div class="qf-value">Top 100</div>
+      <div class="qf-detail">Listed among the 100 Most Influential People in the World by Time Magazine in 2024.</div>
+    </div>
+    <div class="qf-card">
+      <div class="qf-label">Royal Honour</div>
+      <div class="qf-value">Officer OON</div>
+      <div class="qf-detail">Appointed Officer of the Order of Orange-Nassau in 2022 by the Netherlands for his contribution to sport.</div>
+    </div>
+    <div class="qf-card">
+      <div class="qf-label">FIA Licence</div>
+      <div class="qf-value">Platinum</div>
+      <div class="qf-detail">Received FIA Platinum endurance licence in 2025, allowing him to compete in top-level endurance racing.</div>
+    </div>
+    <div class="qf-card">
+      <div class="qf-label">Pseudonym</div>
+      <div class="qf-value">Franz Hermann</div>
+      <div class="qf-detail">The alias Max used to secretly enter Nürburgring Langstrecken-Serie testing in May 2025. Classic Max.</div>
+    </div>
+  </div>
+
+  <!-- RACING TEAM -->
+  <div class="team-block reveal">
+    <div class="img" style="aspect-ratio:3/4;">
+      <img src="images/personal-sim.jpg" alt="Verstappen sim racing" onerror="this.parentElement.innerHTML='<div class=\'ph16-9\' style=\'aspect-ratio:3/4;\'>SIM SETUP<br>personal-sim.jpg</div>'">
+    </div>
+    <div class="text">
+      <h3>Verstappen Racing</h3>
+      <p>In 2022, Max founded <strong>Verstappen.com Racing</strong> (now Verstappen Racing) — his own motorsport team that competes across multiple disciplines. The team has competed in rallying, GT racing, and endurance events, with Max himself sometimes entering its sim racing division.</p>
+      <p style="margin-top:1rem;">It reflects who Max fundamentally is: not a man who races because it's his job, but someone for whom <strong>racing is identity itself</strong>. He creates more opportunities to race when he isn't already racing in the most competitive championship on Earth.</p>
+      <p style="margin-top:1rem;">In September 2025, Max made his <strong>competitive debut on the Nürburgring Nordschleife</strong> in real-world endurance racing, driving for Lionspeed GP. He had entered testing under the pseudonym "Franz Hermann" earlier in the year — reportedly setting an unofficial GT3 lap record — and earned his FIA Platinum licence to compete in top-level endurance events.</p>
+    </div>
+  </div>
+
+  <!-- NORDSCHLEIFE DREAM -->
+  <div class="nordschleife reveal">
+    <h3>The Green Hell Beckons</h3>
+    <p>After testing the <strong>Acura ARX-06 LMDh prototype</strong> at Las Vegas Motor Speedway in November 2024, Verstappen announced his desire to compete at the <strong>24 Hours of Daytona and Le Mans</strong> once his schedule allows. His words: <em>"It's just about finding the time."</em></p>
+    <p style="margin-top:1rem;">For most F1 champions, retirement is the moment they step away from elite competition. For Max Verstappen, it may simply be the moment he has enough time to <strong>do all the other racing he's been postponing</strong>. Le Mans. Daytona. The Nordschleife full-season. The man is not running out of ambition anytime soon.</p>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo-sm">MV<span>1</span></div>
+  <div class="footer-nav">
+    <a href="index.html">Home</a>
+    <a href="records.html">Records</a>
+    <a href="career.html">Career</a>
+    <a href="racing-style.html">Style</a>
+    <a href="timeline.html">Timeline</a>
+  </div>
+</footer>
+
+<script>
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:0.06});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
