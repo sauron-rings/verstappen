@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MV1 — The Rise</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#e10600;--gold:#c9a84c;--bg:#050505;--bg2:#0d0d0d;--surface:#161616;--text:#e8e8e0;--text-dim:#888;--border:#2a2a2a;}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.35;}
+  ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--red);}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 3rem;height:60px;background:rgba(5,5,5,0.95);border-bottom:1px solid rgba(225,6,0,0.3);backdrop-filter:blur(10px);}
+  .nav-logo{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:4px;color:var(--red);text-decoration:none;display:block;}
+  .nav-logo span{color:var(--gold);}
+  nav ul{display:flex;gap:2rem;list-style:none;}
+  nav a{font-size:0.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color 0.2s;}
+  nav a:hover,nav a.active{color:var(--red);}
+
+  .page-header{padding:120px 3rem 5rem;background:linear-gradient(180deg,rgba(139,0,0,0.1) 0%,transparent 100%);border-bottom:1px solid rgba(225,6,0,0.1);position:relative;overflow:hidden;}
+  .page-header::after{content:'RISE';position:absolute;right:-1vw;bottom:-3rem;font-family:'Bebas Neue',cursive;font-size:25vw;color:transparent;-webkit-text-stroke:1px rgba(225,6,0,0.04);pointer-events:none;}
+  .page-tag{font-size:0.62rem;letter-spacing:6px;text-transform:uppercase;color:var(--red);margin-bottom:0.5rem;}
+  .page-title{font-family:'Bebas Neue',cursive;font-size:clamp(48px,9vw,120px);line-height:0.9;letter-spacing:4px;}
+  .page-title span{color:var(--text-dim);}
+
+  .content{max-width:1200px;margin:0 auto;padding:6rem 3rem;}
+
+  /* INTRO SPLIT */
+  .intro-split{display:grid;grid-template-columns:1fr 1fr;gap:4rem;margin-bottom:6rem;align-items:center;}
+  .intro-img{aspect-ratio:4/5;overflow:hidden;border:1px solid rgba(225,6,0,0.2);}
+  .intro-img img{width:100%;height:100%;object-fit:cover;filter:grayscale(15%) contrast(1.1);transition:filter 0.5s;}
+  .intro-img:hover img{filter:grayscale(0%) contrast(1.15);}
+  .img-placeholder{width:100%;height:100%;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.5rem;color:rgba(225,6,0,0.3);font-family:'Bebas Neue',cursive;font-size:0.9rem;letter-spacing:2px;text-align:center;padding:1rem;}
+  .intro-text h2{font-family:'Bebas Neue',cursive;font-size:clamp(32px,5vw,64px);letter-spacing:3px;margin-bottom:1.5rem;}
+  .intro-text h2 span{color:var(--red);}
+  .intro-text p{font-size:0.78rem;line-height:1.9;color:var(--text-dim);margin-bottom:1.2rem;}
+  .intro-text p strong{color:var(--text);}
+
+  /* CAREER CARDS */
+  .career-grid{display:flex;flex-direction:column;gap:1px;background:rgba(255,255,255,0.04);margin-bottom:6rem;}
+  .career-era{display:grid;grid-template-columns:200px 1fr;background:var(--bg2);transition:background 0.3s;}
+  .career-era:hover{background:var(--surface);}
+  .era-year{padding:3rem 2rem;border-right:1px solid rgba(225,6,0,0.15);display:flex;flex-direction:column;justify-content:flex-start;}
+  .era-year .yr{font-family:'Bebas Neue',cursive;font-size:2.5rem;color:var(--red);line-height:1;}
+  .era-year .team{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-top:0.25rem;}
+  .era-body{padding:3rem 2.5rem;}
+  .era-title{font-family:'Bebas Neue',cursive;font-size:1.8rem;letter-spacing:3px;margin-bottom:0.75rem;}
+  .era-desc{font-size:0.75rem;line-height:1.85;color:var(--text-dim);}
+  .era-desc strong{color:var(--gold);}
+  .era-highlight{display:inline-block;margin-top:1.25rem;font-size:0.62rem;letter-spacing:3px;text-transform:uppercase;padding:4px 12px;border:1px solid rgba(225,6,0,0.35);color:var(--red);}
+
+  /* HERITAGE PHOTOS */
+  .photo-pair{display:grid;grid-template-columns:2fr 1fr;gap:1px;margin:4rem 0;background:rgba(255,255,255,0.04);}
+  .photo-block{overflow:hidden;position:relative;}
+  .photo-block img{width:100%;height:100%;object-fit:cover;filter:grayscale(20%) contrast(1.1);transition:filter 0.4s,transform 0.5s;}
+  .photo-block:hover img{filter:grayscale(0%);transform:scale(1.03);}
+  .photo-block .cap{position:absolute;bottom:0;left:0;right:0;padding:1rem 1.5rem;background:linear-gradient(transparent,rgba(0,0,0,0.9));font-size:0.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);}
+  .photo-block-placeholder{width:100%;aspect-ratio:16/9;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.5rem;color:rgba(225,6,0,0.3);font-family:'Bebas Neue',cursive;font-size:0.8rem;letter-spacing:2px;text-align:center;padding:1rem;}
+
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+
+  footer{background:var(--bg2);border-top:1px solid rgba(225,6,0,0.2);padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;}
+  .footer-logo-sm{font-family:'Bebas Neue',cursive;font-size:1.8rem;letter-spacing:4px;color:var(--red);}
+  .footer-logo-sm span{color:var(--gold);}
+  .footer-nav{display:flex;gap:2rem;}
+  .footer-nav a{font-size:0.6rem;letter-spacing:3px;color:var(--text-dim);text-decoration:none;text-transform:uppercase;transition:color 0.2s;}
+  .footer-nav a:hover{color:var(--red);}
+  @media(max-width:768px){nav ul{display:none;}.intro-split,.career-era,.photo-pair{grid-template-columns:1fr;}.footer-nav{display:none;}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">MV<span>1</span></a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="records.html">Records</a></li>
+    <li><a href="career.html" class="active">Career</a></li>
+    <li><a href="racing-style.html">Style</a></li>
+    <li><a href="personal.html">Off Track</a></li>
+    <li><a href="timeline.html">Timeline</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <p class="page-tag">Chapter 02 — The Rise</p>
+  <h1 class="page-title">FROM KARTS<br><span>TO CROWNS</span></h1>
+</div>
+
+<div class="content">
+
+  <!-- INTRO -->
+  <div class="intro-split reveal">
+    <div class="intro-img">
+      <img src="images/career-young.jpg" alt="Young Max Verstappen" onerror="this.parentElement.innerHTML='<div class=\'img-placeholder\'>YOUNG MAX<br>career-young.jpg</div>'">
+    </div>
+    <div class="intro-text">
+      <h2>Born Into <span>Speed</span></h2>
+      <p>Max Emilian Verstappen was born on <strong>30 September 1997</strong> in Hasselt, Belgium, into a family where motorsport wasn't a hobby — it was oxygen. His father, <strong>Jos Verstappen</strong>, was a Formula One driver who competed in 106 Grands Prix. His mother, <strong>Sophie Kumpen</strong>, was a decorated champion kart racer. Racing wasn't something Max chose. It was inevitable.</p>
+      <p>By the age of <strong>two</strong>, Max was on a quad bike. At <strong>four</strong>, he was karting. At <strong>seven</strong>, he won his first race. By <strong>15</strong>, he held three simultaneous international karting titles — two European championships and a World championship — something never done before in the history of karting.</p>
+      <p>The path from go-kart prodigy to Formula One legend wasn't just fast. It was <strong>historically unprecedented at every single step.</strong></p>
+    </div>
+  </div>
+
+  <!-- CAREER ERAS -->
+  <div class="career-grid reveal">
+
+    <div class="career-era">
+      <div class="era-year"><div class="yr">2013</div><div class="team">Karting</div></div>
+      <div class="era-body">
+        <div class="era-title">The Karting Prodigy</div>
+        <div class="era-desc">At 15, Max won the <strong>World KZ Championship</strong> while simultaneously holding two European karting titles — three international titles at once, a feat never accomplished before. Red Bull noticed. The entire motorsport world noticed.</div>
+        <div class="era-highlight">3 Simultaneous World / European Titles</div>
+      </div>
+    </div>
+
+    <div class="career-era">
+      <div class="era-year"><div class="yr">2014</div><div class="team">FIA F3</div></div>
+      <div class="era-body">
+        <div class="era-title">F3 Rocket</div>
+        <div class="era-desc">Bypassing junior formulae, Max went straight into the FIA European F3 Championship. In his <strong>rookie season</strong> he finished third overall, winning six consecutive races. He joined the Red Bull Junior Team mid-year and drove in F1 free practice at Suzuka at <strong>17 years and 3 days old</strong>.</div>
+        <div class="era-highlight">Youngest F1 FP1 Participant</div>
+      </div>
+    </div>
+
+    <div class="career-era">
+      <div class="era-year"><div class="yr">2015</div><div class="team">Toro Rosso</div></div>
+      <div class="era-body">
+        <div class="era-title">History at 17</div>
+        <div class="era-desc">Signed by Scuderia Toro Rosso — <strong>the youngest F1 driver ever to start a race</strong> at 17 years, 166 days. Despite a steep learning curve, he showed breathtaking raw speed. Won Rookie of the Year, Personality of the Year, and Action of the Year at the FIA Awards. In just his first season.</div>
+        <div class="era-highlight">Youngest F1 Race Starter Ever</div>
+      </div>
+    </div>
+
+    <div class="career-era">
+      <div class="era-year"><div class="yr">2016</div><div class="team">Red Bull</div></div>
+      <div class="era-body">
+        <div class="era-title">The Spanish Earthquake</div>
+        <div class="era-desc">Promoted to Red Bull mid-season after four races with Toro Rosso. On debut at the <strong>Spanish Grand Prix</strong>, 18-year-old Max Verstappen won. He became the <strong>youngest race winner in F1 history</strong>. That single afternoon changed the sport forever. Then came Brazil — his rain masterclass from P16 to P3 in 14 laps remains one of the greatest drives anyone has ever witnessed.</div>
+        <div class="era-highlight">Youngest F1 Race Winner Ever</div>
+      </div>
+    </div>
+
+    <div class="career-era">
+      <div class="era-year"><div class="yr">2017–20</div><div class="team">Red Bull</div></div>
+      <div class="era-body">
+        <div class="era-title">The Building Years</div>
+        <div class="era-desc">Racking up wins and podiums but denied titles by the Mercedes superiority of Hamilton and Bottas. <strong>10 race wins, 42 podiums</strong> across four seasons. Growing in maturity, in race craft, in tyre management — becoming complete. The frustration of having the ability but not quite the machinery only sharpened him.</div>
+        <div class="era-highlight">10 Wins · Sharpening the Blade</div>
+      </div>
+    </div>
+
+    <div class="career-era">
+      <div class="era-year"><div class="yr">2021</div><div class="team">Red Bull</div></div>
+      <div class="era-body">
+        <div class="era-title">The Greatest Fight in F1 History</div>
+        <div class="era-desc">Equal machinery. Hamilton vs Verstappen. 22 races decided by <strong>8 points</strong>. The finale in Abu Dhabi, the Safety Car restart, the final lap overtake — one of sport's most explosive conclusions. Max became <strong>the first Dutch Formula One World Champion</strong>. The Netherlands went wild. The world was split. Max was born.</div>
+        <div class="era-highlight">First World Championship · First Dutch Champion</div>
+      </div>
+    </div>
+
+    <div class="career-era">
+      <div class="era-year"><div class="yr">2022</div><div class="team">Red Bull</div></div>
+      <div class="era-body">
+        <div class="era-title">Dominance Begins</div>
+        <div class="era-desc">New regulations. RB18. A machine built for Max. <strong>15 wins</strong> — a new record at the time. He wrapped up the title in Japan with 4 races left. The points record shattered. Michael Schumacher's record of wins in a season? Just a warm-up.</div>
+        <div class="era-highlight">15 Wins · Second Championship</div>
+      </div>
+    </div>
+
+    <div class="career-era">
+      <div class="era-year"><div class="yr">2023</div><div class="team">Red Bull</div></div>
+      <div class="era-body">
+        <div class="era-title">The Most Dominant Season in F1 History</div>
+        <div class="era-desc"><strong>19 wins from 22 races. 10 in a row. 575 points. 21 podiums.</strong> Words run out. Statistics feel inadequate. The RB19 and Max Verstappen became the most unstoppable combination the sport has ever seen. Even people who weren't fans had to admit they were watching something transcendent.</div>
+        <div class="era-highlight">19 Wins · All-Time Records Obliterated · Third Crown</div>
+      </div>
+    </div>
+
+    <div class="career-era">
+      <div class="era-year"><div class="yr">2024</div><div class="team">Red Bull</div></div>
+      <div class="era-body">
+        <div class="era-title">The Fighter's Title</div>
+        <div class="era-desc">McLaren had the faster car from Miami onwards. Norris mounted a stunning challenge. But Max won 9 races — including a <strong>legendary drive from P17 in São Paulo in torrential rain</strong>. He clinched his fourth title in Las Vegas with two races left, driving for a <strong>third-placed constructor</strong>. Pure will. Pure genius.</div>
+        <div class="era-highlight">4th Consecutive Championship · Greatest Drive From P17</div>
+      </div>
+    </div>
+
+    <div class="career-era">
+      <div class="era-year"><div class="yr">2025</div><div class="team">Red Bull</div></div>
+      <div class="era-body">
+        <div class="era-title">The Comeback That Fell 2 Points Short</div>
+        <div class="era-desc">Down <strong>104 points</strong> to Oscar Piastri after Hungary. Six wins in the final nine races. A title fight going to the final lap of the final race in Abu Dhabi. Max won the race. But Norris, finishing second, took the championship by <strong>2 points</strong>. The greatest comeback that wasn't enough — but proved that in any equal machine, Max Verstappen is simply unconquerable.</div>
+        <div class="era-highlight">P2 By 2 Points · The Greatest Near-Miss</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PHOTO PAIR -->
+  <div class="photo-pair reveal">
+    <div class="photo-block" style="aspect-ratio:16/9;">
+      <img src="images/career-spain2016.jpg" alt="2016 Spanish GP debut win" onerror="this.parentElement.innerHTML='<div class=\'photo-block-placeholder\' style=\'aspect-ratio:16/9;\'>SPANISH GP 2016<br>career-spain2016.jpg</div>'">
+      <div class="cap">Spanish GP 2016 · The Birth of a Legend</div>
+    </div>
+    <div class="photo-block" style="aspect-ratio:4/5;">
+      <img src="images/career-abu2021.jpg" alt="Abu Dhabi 2021 first title" onerror="this.parentElement.innerHTML='<div class=\'photo-block-placeholder\' style=\'aspect-ratio:4/5;\'>ABU DHABI 2021<br>career-abu2021.jpg</div>'">
+      <div class="cap">Abu Dhabi 2021 · The First Crown</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo-sm">MV<span>1</span></div>
+  <div class="footer-nav">
+    <a href="index.html">Home</a>
+    <a href="records.html">Records</a>
+    <a href="racing-style.html">Style</a>
+    <a href="personal.html">Off Track</a>
+    <a href="timeline.html">Timeline</a>
+  </div>
+</footer>
+
+<script>
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:0.06});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
