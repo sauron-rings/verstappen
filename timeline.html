@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MV1 — The Timeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#e10600;--gold:#c9a84c;--bg:#050505;--bg2:#0d0d0d;--surface:#161616;--text:#e8e8e0;--text-dim:#888;--border:#2a2a2a;}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.35;}
+  ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--red);}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 3rem;height:60px;background:rgba(5,5,5,0.95);border-bottom:1px solid rgba(225,6,0,0.3);backdrop-filter:blur(10px);}
+  .nav-logo{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:4px;color:var(--red);text-decoration:none;}
+  .nav-logo span{color:var(--gold);}
+  nav ul{display:flex;gap:2rem;list-style:none;}
+  nav a{font-size:0.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);text-decoration:none;transition:color 0.2s;}
+  nav a:hover,nav a.active{color:var(--red);}
+
+  .page-header{padding:120px 3rem 5rem;background:linear-gradient(180deg,rgba(139,0,0,0.1) 0%,transparent 100%);border-bottom:1px solid rgba(225,6,0,0.1);position:relative;overflow:hidden;}
+  .page-header::after{content:'TIME';position:absolute;right:-2vw;bottom:-3rem;font-family:'Bebas Neue',cursive;font-size:22vw;color:transparent;-webkit-text-stroke:1px rgba(225,6,0,0.04);pointer-events:none;}
+  .page-tag{font-size:0.62rem;letter-spacing:6px;text-transform:uppercase;color:var(--red);margin-bottom:0.5rem;}
+  .page-title{font-family:'Bebas Neue',cursive;font-size:clamp(48px,9vw,120px);line-height:0.9;letter-spacing:4px;}
+  .page-title span{color:var(--text-dim);}
+
+  .content{max-width:900px;margin:0 auto;padding:6rem 3rem;}
+
+  /* TIMELINE */
+  .timeline{position:relative;padding-left:3rem;}
+  .timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,rgba(225,6,0,0.5) 5%,rgba(225,6,0,0.5) 95%,transparent);}
+
+  .tl-item{position:relative;padding:0 0 4rem 3rem;opacity:0;transform:translateX(-20px);transition:opacity 0.7s ease,transform 0.7s ease;}
+  .tl-item.visible{opacity:1;transform:translateX(0);}
+
+  .tl-item::before{
+    content:'';
+    position:absolute;left:-5px;top:8px;
+    width:10px;height:10px;border-radius:50%;
+    background:var(--bg);border:2px solid rgba(225,6,0,0.4);
+    transition:border-color 0.3s,box-shadow 0.3s;
+  }
+  .tl-item:hover::before{border-color:var(--red);box-shadow:0 0 12px rgba(225,6,0,0.6);}
+  .tl-item.champion::before{background:var(--red);border-color:var(--red);box-shadow:0 0 12px rgba(225,6,0,0.5);}
+
+  .tl-year{font-family:'Bebas Neue',cursive;font-size:0.85rem;letter-spacing:4px;color:var(--red);margin-bottom:0.3rem;}
+  .tl-title{font-family:'Bebas Neue',cursive;font-size:1.8rem;letter-spacing:2px;margin-bottom:0.75rem;line-height:1.1;}
+  .tl-body{font-size:0.73rem;line-height:1.85;color:var(--text-dim);}
+  .tl-body strong{color:var(--text);}
+  .tl-tag{display:inline-block;margin-top:1rem;font-size:0.55rem;letter-spacing:3px;text-transform:uppercase;padding:3px 10px;border:1px solid;}
+  .tl-tag.red{border-color:rgba(225,6,0,0.4);color:var(--red);}
+  .tl-tag.gold{border-color:rgba(201,168,76,0.4);color:var(--gold);}
+
+  .tl-photo{margin-top:1.5rem;width:100%;max-width:500px;aspect-ratio:16/9;overflow:hidden;border:1px solid rgba(225,6,0,0.15);}
+  .tl-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(20%) contrast(1.1);transition:filter 0.4s;}
+  .tl-photo:hover img{filter:grayscale(0%);}
+  .tl-photo-ph{width:100%;height:100%;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.4rem;color:rgba(225,6,0,0.3);font-family:'Bebas Neue',cursive;font-size:0.75rem;letter-spacing:2px;text-align:center;padding:0.5rem;}
+
+  footer{background:var(--bg2);border-top:1px solid rgba(225,6,0,0.2);padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;}
+  .footer-logo-sm{font-family:'Bebas Neue',cursive;font-size:1.8rem;letter-spacing:4px;color:var(--red);}
+  .footer-logo-sm span{color:var(--gold);}
+  .footer-nav{display:flex;gap:2rem;}
+  .footer-nav a{font-size:0.6rem;letter-spacing:3px;color:var(--text-dim);text-decoration:none;text-transform:uppercase;transition:color 0.2s;}
+  .footer-nav a:hover{color:var(--red);}
+  @media(max-width:768px){nav ul{display:none;}.timeline{padding-left:1.5rem;}.tl-item{padding-left:1.5rem;}.footer-nav{display:none;}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">MV<span>1</span></a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="records.html">Records</a></li>
+    <li><a href="career.html">Career</a></li>
+    <li><a href="racing-style.html">Style</a></li>
+    <li><a href="personal.html">Off Track</a></li>
+    <li><a href="timeline.html" class="active">Timeline</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <p class="page-tag">Chapter 05 — The Timeline</p>
+  <h1 class="page-title">THE FULL<br><span>STORY</span></h1>
+</div>
+
+<div class="content">
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-year">1997</div>
+      <div class="tl-title">Born Into Speed</div>
+      <div class="tl-body">Max Emilian Verstappen born on <strong>30 September 1997</strong> in Hasselt, Belgium. His father Jos is a Formula One driver. His mother Sophie is a karting champion. The DNA is written in combustion.</div>
+      <div class="tl-tag red">Origin Story</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-year">2001–2012</div>
+      <div class="tl-title">Karting Prodigy</div>
+      <div class="tl-body">Begins karting at <strong>age 4</strong>. Wins first race at 7. By his early teens he is dominating national and European karting championships, winning multiple titles across Belgium and the Netherlands. Racing isn't a hobby — it's everything.</div>
+      <div class="tl-tag red">Karting Era</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-year">2013</div>
+      <div class="tl-title">Triple Crown of Karting</div>
+      <div class="tl-body">At just <strong>15 years old</strong>, Max holds the World KZ Championship alongside two European karting titles simultaneously. Three international titles at once — a feat never accomplished before in the history of the sport. The motorsport world takes notice.</div>
+      <div class="tl-tag gold">Historic Achievement</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-year">2014</div>
+      <div class="tl-title">FIA F3 & Red Bull Junior</div>
+      <div class="tl-body">Skips Formula 4 entirely. Goes straight to FIA F3 European Championship. Finishes third in his rookie season, wins six races in a row. Red Bull signs him to their junior programme. In October, he drives an F1 car in free practice at <strong>Suzuka, aged 17 years and 3 days</strong> — making him the youngest ever to do so.</div>
+      <div class="tl-tag red">F1 on the Horizon</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-year">2015</div>
+      <div class="tl-title">The Youngest F1 Driver Ever</div>
+      <div class="tl-body">Signs for Scuderia Toro Rosso. Makes his F1 race debut at the <strong>2015 Australian Grand Prix</strong> aged 17 years and 166 days — <strong>the youngest driver in F1 history</strong>, breaking Jaime Alguersuari's record by nearly two years. Wins Rookie of the Year, Personality of the Year, and Action of the Year at the FIA Awards — in his debut season.</div>
+      <div class="tl-tag gold">Record Broken</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-year">May 2016</div>
+      <div class="tl-title">Spanish GP — The Birth of a Legend</div>
+      <div class="tl-body">Promoted to Red Bull Racing after just four Toro Rosso races in 2016. On debut in Barcelona, the 18-year-old wins the Spanish Grand Prix. <strong>Youngest race winner in F1 history.</strong> He never looked back. Autosport called it "the most remarkable debut in the sport's modern era."</div>
+      <div class="tl-tag gold">Youngest Ever Race Winner</div>
+      <div class="tl-photo">
+        <img src="images/tl-spain2016.jpg" alt="Spain 2016 win" onerror="this.parentElement.innerHTML='<div class=\'tl-photo-ph\'>SPAIN 2016 WIN<br>tl-spain2016.jpg</div>'">
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-year">Nov 2016</div>
+      <div class="tl-title">Brazil — The Rain Masterclass</div>
+      <div class="tl-body">In torrential rain at Interlagos, starting P16 with 14 laps to go, Max drives one of the greatest wet-weather performances in F1 history. <strong>Nine overtakes</strong>. Finished third. Commentators lost their voices. F1 fans lost their minds. A calling card for eternity.</div>
+      <div class="tl-tag red">Legendary Performance</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-year">2017–2020</div>
+      <div class="tl-title">Building. Winning. Waiting.</div>
+      <div class="tl-body">Ten victories, 42 podiums across four seasons. Finishes no lower than 6th in the championship. Develops full race craft: tyre management, strategy, defence. The Mercedes era denies him the title, but makes him <strong>complete</strong>. He's sharpening himself into something unstoppable.</div>
+      <div class="tl-tag red">The Formative Years</div>
+    </div>
+
+    <div class="tl-item champion">
+      <div class="tl-year">Dec 2021</div>
+      <div class="tl-title">Abu Dhabi — The First Crown ★</div>
+      <div class="tl-body">Equal points. Final lap. Safety Car restart. Fresh tyres vs. worn. Max overtakes Lewis Hamilton on the last corner of the last lap to become <strong>the first Dutch Formula One World Champion</strong>. One of the most dramatic conclusions to a season in sporting history.</div>
+      <div class="tl-tag gold">World Champion #1</div>
+      <div class="tl-photo">
+        <img src="images/tl-abu2021.jpg" alt="Abu Dhabi 2021 champion" onerror="this.parentElement.innerHTML='<div class=\'tl-photo-ph\'>ABU DHABI 2021<br>tl-abu2021.jpg</div>'">
+      </div>
+    </div>
+
+    <div class="tl-item champion">
+      <div class="tl-year">Oct 2022</div>
+      <div class="tl-title">Japan — Dominant Title Defence ★</div>
+      <div class="tl-body"><strong>15 wins</strong>. New record. Wraps up second championship in Japan with four races remaining. Hamilton's points record broken. The RB18 is a rocket, and Max makes it fly faster than anyone expected. A commanding, authoritative second title.</div>
+      <div class="tl-tag gold">World Champion #2</div>
+    </div>
+
+    <div class="tl-item champion">
+      <div class="tl-year">2023</div>
+      <div class="tl-title">The Most Dominant Season in F1 History ★</div>
+      <div class="tl-body"><strong>19 wins. 10 in a row. 575 points. 21 podiums.</strong> All new records. All smashed by Max Verstappen with the RB19. The word "dominant" felt inadequate. Commentators ran out of superlatives. Even the most neutral observers admitted they were watching something generational.</div>
+      <div class="tl-tag gold">World Champion #3 · All Records Broken</div>
+      <div class="tl-photo">
+        <img src="images/tl-2023season.jpg" alt="2023 dominant season" onerror="this.parentElement.innerHTML='<div class=\'tl-photo-ph\'>2023 DOMINANCE<br>tl-2023season.jpg</div>'">
+      </div>
+    </div>
+
+    <div class="tl-item champion">
+      <div class="tl-year">Nov 2024</div>
+      <div class="tl-title">Las Vegas — The Fighter's Fourth ★</div>
+      <div class="tl-body">McLaren had the faster car. Norris mounted a real challenge. But Max won <strong>9 races</strong> — including a mythical drive from P17 in São Paulo rain — to clinch his fourth consecutive title at Las Vegas. The first driver in 41 years to win a championship in a <strong>third-placed constructor</strong>.</div>
+      <div class="tl-tag gold">World Champion #4</div>
+      <div class="tl-photo">
+        <img src="images/tl-lasvegas2024.jpg" alt="Las Vegas 2024 fourth title" onerror="this.parentElement.innerHTML='<div class=\'tl-photo-ph\'>LAS VEGAS 2024<br>tl-lasvegas2024.jpg</div>'">
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-year">2025</div>
+      <div class="tl-title">The Greatest Near-Miss</div>
+      <div class="tl-body">104 points down after Hungary. <strong>Six wins in the final nine races.</strong> Title fight goes to Abu Dhabi, final race, final lap. Max wins the race. Norris finishes second. Championship to Norris by <strong>2 points</strong>. The greatest comeback attempt that fell just short — and still proved Max is the finest racing driver alive.</div>
+      <div class="tl-tag red">2 Points Short · The Legend Continues</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-year">2026 →</div>
+      <div class="tl-title">The Story Isn't Over</div>
+      <div class="tl-body">Still only <strong>28 years old</strong>. Contracted to Red Bull until 2028. The record books still have blank pages. Le Mans awaits. A fifth title awaits. The ceiling of what Max Verstappen can achieve is nowhere near in sight. The legend is still being written, right now, in real time.</div>
+      <div class="tl-tag red">To Be Continued...</div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo-sm">MV<span>1</span></div>
+  <div class="footer-nav">
+    <a href="index.html">Home</a>
+    <a href="records.html">Records</a>
+    <a href="career.html">Career</a>
+    <a href="racing-style.html">Style</a>
+    <a href="personal.html">Off Track</a>
+  </div>
+</footer>
+
+<script>
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:0.1});
+document.querySelectorAll('.tl-item').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
